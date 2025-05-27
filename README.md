@@ -35,7 +35,7 @@ An AI-powered stock forecasting app built with Next.js, shadcn/ui, Prisma, and t
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/stock-prediction-app.git
+git clone https://github.com/zeewaqar/stock-prediction-app.git
 cd stock-prediction-app
 ```
 
