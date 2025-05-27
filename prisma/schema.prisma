@@ -1,0 +1,17 @@
+datasource db {
+  provider = "sqlite" // or "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Prediction {
+  id             String   @id @default(uuid())
+  symbol         String
+  datePredicted  DateTime
+  predictedPrice Float
+  actualPrice    Float?    // nullable; will be updated later
+  createdAt      DateTime @default(now())
+}
