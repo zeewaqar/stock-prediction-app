@@ -15,3 +15,13 @@ model Prediction {
   actualPrice    Float?    // nullable; will be updated later
   createdAt      DateTime @default(now())
 }
+model StockPrice {
+  id        Int      @id @default(autoincrement())
+  symbol    String
+  date      DateTime
+  price     Float
+  createdAt DateTime @default(now())
+
+  @@unique([symbol, date], name: "symbol_date")
+}
+

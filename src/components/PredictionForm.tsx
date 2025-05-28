@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import StockChart from '@/components/StockChart';
 import ForecastTable from '@/components/ForecastTable';
+import StockHistoryTable from '@/components/StockHistoryTable';
 
 type PriceData = { date: string; price: number };
 type ForecastEntry = { date: string; predictedPrice: number };
@@ -20,25 +21,29 @@ export default function PredictionForm() {
     setLoading(true);
     setErrorMsg('');
     try {
-      // 1. Fetch stock prices
+      // 1. Fetch stock prices from FMP API
       const res = await fetch('/api/stocks', {
         method: 'POST',
         body: JSON.stringify({ symbol }),
       });
       const stockData = await res.json();
-      const series = stockData['Time Series (Daily)'];
 
-      const prices = Object.entries(series)
-        .slice(0, 30)
-        .map(([date, info]) => ({
-          date,
-          price: parseFloat((info as { '4. close': string })['4. close']),
-        }))
-        .reverse();
+      if (!stockData.prices || !Array.isArray(stockData.prices)) {
+        setErrorMsg('Invalid data received from stock API');
+        setLoading(false);
+        return;
+      }
+
+      const prices = stockData.prices
+        .slice(-30) // get last 30 days
+        .map((entry: { date: string; price: number }) => ({
+          date: entry.date,
+          price: entry.price,
+        }));
 
       setChartData(prices);
 
-      // 2. Predict 7-day forecast
+      // 2. Predict 7-day forecast using FinGPT
       const predictRes = await fetch('/api/predict', {
         method: 'POST',
         body: JSON.stringify({ symbol, prices }),
@@ -82,6 +87,7 @@ export default function PredictionForm() {
       {chartData.length > 0 && (
         <div className="mt-6">
           <StockChart data={chartData} />
+          <StockHistoryTable prices={chartData} />
         </div>
       )}
 
@@ -90,6 +96,7 @@ export default function PredictionForm() {
           <ForecastTable forecast={forecast} />
         </div>
       )}
+      
     </div>
   );
 }

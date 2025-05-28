@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { Button } from './ui/button';
 
 type Prediction = {
   id: string;
@@ -153,6 +154,28 @@ export default function PredictionHistory() {
           Next
         </button>
       </div>
+      <Button
+        variant="destructive"
+        onClick={async () => {
+          const res = await fetch("/api/admin/clear", {method: "POST"});
+          const result = await res.json();
+          if (result.success) {
+            setData([]);
+            setTotal(0);
+            setMae(null);
+            setMse(null);
+            setAccuracy(null);
+            setSymbol('');
+            setSymbols([]);
+            setPage(1);
+            
+            alert("Predictions cleared!");
+          } else {
+            alert(result.error || "Failed to clear predictions");
+          }
+        }}>
+        Clear Predictions
+      </Button>
     </div>
   );
 }
